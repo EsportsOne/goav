@@ -9,7 +9,7 @@ import "C"
 import (
 	"unsafe"
 
-	"github.com/asticode/goav/avutil"
+	"../avutil"
 )
 
 //Allocate an empty Context.

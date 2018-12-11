@@ -17,7 +17,7 @@ import "C"
 import (
 	"unsafe"
 
-	"github.com/asticode/goav/avutil"
+	"../avutil"
 )
 
 type (
@@ -75,14 +75,13 @@ func SwsIssupportedendiannessconversion(p avutil.PixelFormat) int {
 	return int(C.sws_isSupportedEndiannessConversion((C.enum_AVPixelFormat)(p)))
 }
 
-////Scale the image slice in srcSlice and put the resulting scaled slice in the image in dst.
-func SwsScale(ctxt *Context, src [8]*uint8, str [8]int32, y, h int, d [8]*uint8, ds [8]int32) int {
+func SwsScale(ctxt *Context, src *uint8, str int, y, h int, d *uint8, ds int) int {
 	cctxt := (*C.struct_SwsContext)(unsafe.Pointer(ctxt))
-	csrc := (**C.uint8_t)(unsafe.Pointer(&src[0]))
+	csrc := (*C.uint8_t)(unsafe.Pointer(src))
 	cstr := (*C.int)(unsafe.Pointer(&str))
-	cd := (**C.uint8_t)(unsafe.Pointer(&d[0]))
+	cd := (*C.uint8_t)(unsafe.Pointer(d))
 	cds := (*C.int)(unsafe.Pointer(&ds))
-	return int(C.sws_scale(cctxt, csrc, cstr, C.int(y), C.int(h), cd, cds))
+	return int(C.sws_scale(cctxt, &csrc, cstr, C.int(y), C.int(h), &cd, cds))
 }
 
 func SwsSetcolorspacedetails(ctxt *Context, it *int, sr int, t *int, dr, b, c, s int) int {

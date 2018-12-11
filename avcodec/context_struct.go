@@ -9,7 +9,7 @@ import "C"
 import (
 	"unsafe"
 
-	"github.com/asticode/goav/avutil"
+	"../avutil"
 )
 
 func (ctxt *Context) ActiveThreadType() int {
