@@ -18,6 +18,7 @@ import (
 	"unsafe"
 
 	"../avutil"
+	"github.com/davecgh/go-spew/spew"
 )
 
 type (
@@ -28,17 +29,18 @@ type (
 )
 
 const (
-	SWS_FAST_BILINEAR = 1
-	SWS_BILINEAR      = 2
-	SWS_BICUBIC       = 4
-	SWS_X             = 8
-	SWS_POINT         = 0x10
-	SWS_AREA          = 0x20
-	SWS_BICUBLIN      = 0x40
-	SWS_GAUSS         = 0x80
-	SWS_SINC          = 0x100
-	SWS_LANCZOS       = 0x200
-	SWS_SPLINE        = 0x400
+	SWS_FAST_BILINEAR int = C.SWS_FAST_BILINEAR
+	SWS_BILINEAR      int = C.SWS_BILINEAR
+	SWS_BICUBIC       int = C.SWS_BICUBIC
+	SWS_X             int = C.SWS_X
+	SWS_POINT         int = C.SWS_POINT
+	SWS_AREA          int = C.SWS_AREA
+	SWS_BICUBLIN      int = C.SWS_BICUBLIN
+	SWS_GAUSS         int = C.SWS_GAUSS
+	SWS_SINC          int = C.SWS_SINC
+	SWS_LANCZOS       int = C.SWS_LANCZOS
+	SWS_SPLINE        int = C.SWS_SPLINE
+	SWS_ACCURATE_RND 	int = C.SWS_ACCURATE_RND
 )
 
 //Return the LIBSWSCALE_VERSION_INT constant.
@@ -75,14 +77,25 @@ func SwsIssupportedendiannessconversion(p avutil.PixelFormat) int {
 	return int(C.sws_isSupportedEndiannessConversion((C.enum_AVPixelFormat)(p)))
 }
 
-func SwsScale(ctxt *Context, src *uint8, str int, y, h int, d *uint8, ds int) int {
+func SwsScale(ctxt *Context, src *uint8, str [8]int32, y, h int, d *uint8, ds [8]int32) int {
 	cctxt := (*C.struct_SwsContext)(unsafe.Pointer(ctxt))
-	csrc := (*C.uint8_t)(unsafe.Pointer(src))
-	cstr := (*C.int)(unsafe.Pointer(&str))
-	cd := (*C.uint8_t)(unsafe.Pointer(d))
-	cds := (*C.int)(unsafe.Pointer(&ds))
-	return int(C.sws_scale(cctxt, &csrc, cstr, C.int(y), C.int(h), &cd, cds))
+	csrc := (**C.uint8_t)(unsafe.Pointer(&src))
+	cstr := (*[1 << 30]C.int)(unsafe.Pointer(&str))[:8:8]
+	cd := (**C.uint8_t)(unsafe.Pointer(&d))
+	cds := (*[1 << 30]C.int)(unsafe.Pointer(&ds))[:8:8]
+	spew.Dump(&cstr)
+	// return 1
+	return int(C.sws_scale(cctxt, csrc, &cstr, C.int(y), C.int(h), cd, &cds))
 }
+
+// func SwsScale(ctxt *Context, src *uint8, str [8]int32, y, h int, d *uint8, ds [8]int32) int {
+// 	cctxt := (*C.struct_SwsContext)(unsafe.Pointer(ctxt))
+// 	csrc := (*C.uint8_t)(unsafe.Pointer(src))
+// 	cstr := (*C.int)(unsafe.Pointer(&str))
+// 	cd := (*C.uint8_t)(unsafe.Pointer(d))
+// 	cds := (*C.int)(unsafe.Pointer(&ds))
+// 	return int(C.sws_scale(cctxt, &csrc, cstr, C.int(y), C.int(h), &cd, cds))
+// }
 
 func SwsSetcolorspacedetails(ctxt *Context, it *int, sr int, t *int, dr, b, c, s int) int {
 	cit := (*C.int)(unsafe.Pointer(it))

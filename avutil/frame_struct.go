@@ -5,13 +5,31 @@ package avutil
 //#include <stdlib.h>
 import "C"
 import "unsafe"
+// import "github.com/davecgh/go-spew/spew"
+
+type LinesizeValue C.int
 
 func (f *Frame) Data() *uint8 {
+	// return (*uint8)(unsafe.Pointer((*C.uint8_t)(unsafe.Pointer(&f.data))))
 	return (*uint8)(unsafe.Pointer((*C.uint8_t)(unsafe.Pointer(&f.data))))
 }
 
-func (f *Frame) Linesize() int {
-	return int(*(*C.int)(unsafe.Pointer(&f.linesize)))
+func (f *Frame) Linesize() [8]int32 {
+	var arr [8]int32
+
+	arr[0] = int32(*(*C.int)(unsafe.Pointer(&f.linesize[0])))
+	arr[1] = int32(*(*C.int)(unsafe.Pointer(&f.linesize[1])))
+	arr[2] = int32(*(*C.int)(unsafe.Pointer(&f.linesize[2])))
+	arr[3] = int32(*(*C.int)(unsafe.Pointer(&f.linesize[3])))
+	arr[4] = int32(*(*C.int)(unsafe.Pointer(&f.linesize[4])))
+	arr[5] = int32(*(*C.int)(unsafe.Pointer(&f.linesize[5])))
+	arr[6] = int32(*(*C.int)(unsafe.Pointer(&f.linesize[6])))
+	arr[7] = int32(*(*C.int)(unsafe.Pointer(&f.linesize[7])))
+	// spew.Dump(&f.linesize)
+
+	// slice := (*[1 << 30]LinesizeValue)(unsafe.Pointer(&f.linesize))[:8:8]
+
+	return arr
 }
 
 func (f *Frame) Width() int {
